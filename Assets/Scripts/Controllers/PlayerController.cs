@@ -26,6 +26,7 @@ namespace TDR.Controllers
         private Material materialChosenForPlayer;
 
         public Action<MoveState> onPlayerMovementChange;
+        public Action<bool> onPlayerGoOppositeLane;
         public bool isChangingLane = false;
         public bool canMove = false;
         public int playerStartLaneIndex = 2;
@@ -106,6 +107,7 @@ namespace TDR.Controllers
 
         public void MovePlayer(int laneIndex, float steerAngle)
         {
+            if(player.carForwardSpeed == 0) { return; }
             if (laneIndex >= totalLaneNumberForPlayerMove || laneIndex < 0)
             {
                 return;
@@ -149,6 +151,7 @@ namespace TDR.Controllers
             player.transform.position = targetPos;
             player.SetLaneIndex(laneIndex);
             isChangingLane = false;
+            CheckPlayerIfOppositeLine();
         }
 
 
@@ -213,13 +216,23 @@ namespace TDR.Controllers
                     0
                     );
             player.SetMaterial(materialChosenForPlayer);
+            onPlayerGoOppositeLane?.Invoke(false);
             isChangingLane = false;
             distanceTravel = 0;
         }
 
-        public bool CheckPlayerIfOppositeLine()
+        public void CheckPlayerIfOppositeLine()
         {
-            return player.GetLaneIndex() < totalLaneNumberForPlayerMove / 2;
+            bool check = player.GetLaneIndex() < totalLaneNumberForPlayerMove / 2;
+
+            if (check)
+            {
+                onPlayerGoOppositeLane?.Invoke(true);
+            }
+            else
+            {
+                onPlayerGoOppositeLane?.Invoke(false);
+            }
         }
 
         public float GetCurrentSpeed()

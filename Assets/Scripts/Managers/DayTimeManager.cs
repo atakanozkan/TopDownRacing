@@ -24,12 +24,6 @@ namespace TDR.Managers
 
         public bool isFullDayEnabled = false;
 
-        private void Start()
-        {
-            currentDayTimeZone = GetDayTimeZoneByTime();
-            onDayTimeChanged?.Invoke(currentDayTimeZone.dayTimeType);
-        }
-
         public void StartNewZone(GameMode gameMode)
         {
             if (gameMode == GameMode.FullDayMode)

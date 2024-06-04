@@ -44,7 +44,7 @@ namespace TDR.Models.Player
             {
                 return;
             }
-             playerRenderer.materials = new Material[] { material, lightMaterial };
+             playerRenderer.materials = new Material[] { material , lightMaterial };
         }
     }
 }

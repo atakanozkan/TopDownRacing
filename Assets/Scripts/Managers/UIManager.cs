@@ -29,6 +29,8 @@ namespace TDR.Managers
         [SerializeField] private TextMeshProUGUI resumeCountDownText;
         [SerializeField] private TextMeshProUGUI gameOverPanelScoreText;
         [SerializeField] private TextMeshProUGUI gameOverPanelDistanceText;
+        [SerializeField] private TextMeshProUGUI oppositeLaneBonusText;
+        [SerializeField] private TextMeshProUGUI nightTimeBonusText;
 
         #region Canvas Groups
         [SerializeField] private CanvasGroup settingsPanel;
@@ -187,6 +189,8 @@ namespace TDR.Managers
                 gameOverPanelScoreText.text = ((int) gameStats.Score).ToString();
                 gameOverPanelDistanceText.text = (gameStats.Distance / 1000f).ToString("F2") + " KM";
                 mainMask.DOFade(0.5f, 0.5f).SetDelay(0.1f).From(0f);
+                nightTimeBonusText.gameObject.SetActive(false);
+                oppositeLaneBonusText.gameObject.SetActive(false);
                 SetMaskState(mainMask, true);
                 isGamePauseOpen = false;
                 DG.Tweening.Sequence sequence = DOTween.Sequence();
@@ -212,6 +216,44 @@ namespace TDR.Managers
             {
                 SetMaskState(mainMask, false);
                 FadeControlsPanel();
+            }
+        }
+
+        private void UpdateOppositeLaneBonusUI(bool active)
+        {
+            if (active)
+            {
+                if(oppositeLaneBonusText.gameObject.active == false) {
+                    oppositeLaneBonusText.gameObject.SetActive(true);
+                    oppositeLaneBonusText.text =
+                    "Opposite Lane Bonus: " + GameManager.Instance.GetScoreManager().
+                    GetOppositeLaneBonusMultiplier().ToString() + "x";
+                    oppositeLaneBonusText.DOFade(1f, 1f).SetDelay(0.1f).From(0f);
+                }
+            }
+            else
+            {
+                oppositeLaneBonusText.gameObject.SetActive(false);
+            }
+        }
+
+        private void UpdateNightTimeBonusUI(DayTimeType type)
+        {
+            if(type == DayTimeType.Night &&
+                GameManager.Instance.GetScoreManager().
+                IsNightBonusAvailableForMode())
+            {
+                if (nightTimeBonusText.gameObject.active == false)
+                {
+                    nightTimeBonusText.gameObject.SetActive(true);
+                    nightTimeBonusText.text =
+                        "Night Bonus: " + GameManager.Instance.GetScoreManager().GetNightBonusMultiplier().ToString()+"x";
+                    nightTimeBonusText.DOFade(1f, 1f).SetDelay(0.1f).From(0f);
+                }
+            }
+            else
+            {
+                nightTimeBonusText.gameObject.SetActive(false);
             }
         }
 
@@ -280,6 +322,8 @@ namespace TDR.Managers
         private void OnEnable()
         {
             GameManager.Instance.OnGameStateChanged += ControlPanels;
+            GameManager.Instance.GetPlayerController().onPlayerGoOppositeLane += UpdateOppositeLaneBonusUI;
+            GameManager.Instance.GetDayTimeManager().onDayTimeChanged += UpdateNightTimeBonusUI;
         }
 
         private void OnDisable()
@@ -287,6 +331,8 @@ namespace TDR.Managers
             if(GameManager.Instance != null)
             {
                 GameManager.Instance.OnGameStateChanged -= ControlPanels;
+                GameManager.Instance.GetPlayerController().onPlayerGoOppositeLane -= UpdateOppositeLaneBonusUI;
+                GameManager.Instance.GetDayTimeManager().onDayTimeChanged -= UpdateNightTimeBonusUI;
             }
         }
     }

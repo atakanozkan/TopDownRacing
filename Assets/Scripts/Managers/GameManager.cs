@@ -67,6 +67,7 @@ namespace TDR.Managers
             npcCarManager.BuildControlDictionaries();
             dayTimeManager.StartNewZone(chosenGameMode);
             ChangeGameState(GameState.Playing);
+            Debug.Log(chosenGameMode);
         }
 
         public void TryAgain()
@@ -182,6 +183,15 @@ namespace TDR.Managers
             return defaultGameSettingsData;
         }
 
+        public void QuitGame()
+        {
+            #if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                        Application.Quit();
+            #endif
+        }
+
         public void SetGameSettingsData(GameSettingsData gameSettingsData)
         {
             currentGameSettingsData = gameSettingsData;
@@ -196,6 +206,11 @@ namespace TDR.Managers
         public GameSettingsRuleProperty ConvertSettingsFieldToProperty()
         {
             return gameSettingsRuleField.ToProperty();
+        }
+
+        public GameMode GetCurrentGameMode()
+        {
+            return chosenGameMode;
         }
 
         public void SetUIManager(UIManager manager)

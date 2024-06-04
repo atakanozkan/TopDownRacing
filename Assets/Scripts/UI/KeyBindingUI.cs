@@ -52,8 +52,14 @@ namespace TDR.UI
                 {
                     if (Input.GetKeyDown(keyCode))
                     {
+                        if(keyCode == KeyCode.Mouse0)
+                        {
+                            continue;
+                        }
+
                         if (keyCode == currentKey)
                         {
+                            setKey(keyCode);
                             keyPressed = true;
                             break;
                         }
